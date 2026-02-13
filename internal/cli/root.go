@@ -9,9 +9,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:	"jobgocli",
+	Use:	"jobgo",
 	Short:	"A CLI tool to find and track job opportunities",
-	Long:	`jobgocli crawls jobs from your target companies, matches them against your resume, and notifies you in real-time.`,
+	Long:	`jobgo crawls jobs from your target companies, matches them against your resume, and notifies you in real-time.`,
 }
 
 func Execute() {
@@ -24,7 +24,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().String("config", "", "config file (default is $HOME/.jobgocli/config.yaml)")
+	rootCmd.PersistentFlags().String("config", "", "config file (default is $HOME/.jobgo/config.yaml)")
 	rootCmd.PersistentFlags().Bool("verbose", false, "enable verbose output")
 	rootCmd.PersistentFlags().Bool("debug", false, "enable debug output")
 }
@@ -41,7 +41,7 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		viper.AddConfigPath(home + "/.jobgocli")
+		viper.AddConfigPath(home + "/.jobgo")
 		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
 	}

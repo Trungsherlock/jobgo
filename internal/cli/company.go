@@ -19,6 +19,14 @@ var companyAddCmd = &cobra.Command{
 	},
 }
 
+var companyImportCmd = &cobra.Command{
+	Use:   "import",
+	Short: "Bulk import companies from a YAML file",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("TODO: import companies")
+	},
+}
+
 var companyListCmd = &cobra.Command{
 	Use:	"list",
 	Short:	"List tracked companies",
@@ -39,10 +47,12 @@ var companyRemoveCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(companyCmd)
 	companyCmd.AddCommand(companyAddCmd)
-	companyCmd.AddCommand(companyListCmd)
+	companyCmd.AddCommand(companyImportCmd)
 	companyCmd.AddCommand(companyRemoveCmd)
+	companyCmd.AddCommand(companyListCmd)
 
 	companyAddCmd.Flags().String("name", "", "Company name")
 	companyAddCmd.Flags().String("platform", "", "ATS platform (lever, greenhouse)")
 	companyAddCmd.Flags().String("slug", "", "Platform slug")
+	companyImportCmd.Flags().String("file", "", "Path to companies YAML file")
 }
