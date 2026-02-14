@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS applications (
+    id TEXT PRIMARY KEY,
+    job_id TEXT NOT NULL REFERENCES jobs(id),
+    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status TEXT DEFAULT 'applied',
+    notes TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
