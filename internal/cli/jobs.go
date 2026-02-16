@@ -2,6 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
+	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 )
@@ -14,8 +18,48 @@ var jobsCmd = &cobra.Command{
 var jobsListCmd = &cobra.Command{
 	Use:	"list",
 	Short:	"List jobs sorted by match score",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("TODO: list jobs")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		minMatch, _ := cmd.Flags().GetInt("min-match")
+		company, _ := cmd.Flags().GetString("company")
+		onlyNew, _ := cmd.Flags().GetBool("new")
+		onlyRemote, _ := cmd.Flags().GetBool("remote")
+
+		jobs, err := db.ListJobs(float64(minMatch), company, onlyNew, onlyRemote)
+		if err != nil {
+			return fmt.Errorf("listing jobs: %w", err)
+		}	
+		if len(jobs) == 0 {
+			fmt.Println("No jobs found matching the criteria.")
+			return nil
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintln(w, "ID\tSCORE\tTITLE\tCOMPANY\tLOCATION\tSTATUS")
+		for _, j := range jobs {
+			id := j.ID
+			score := "-"
+			if j.MatchScore != nil {
+				score = fmt.Sprintf("%.0f", *j.MatchScore)
+			}
+			location := ""
+			if j.Location != nil {
+				location = *j.Location
+			}
+			title := j.Title
+			if len(title) > 45 {
+				title = title[:42] + "..."
+			}
+			companyName := j.CompanyID[:8]
+			c, err := db.GetCompany(j.CompanyID)
+			if err == nil {
+				companyName = c.Name
+			}
+
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", id, score, title, companyName, location, j.Status)
+		}
+		w.Flush()
+		fmt.Printf("\n%d jobs total\n", len(jobs))
+		return nil
 	},
 }
 
@@ -23,8 +67,43 @@ var jobsShowCmd = &cobra.Command{
 	Use:	"show",
 	Short:	"Show full job description + match score + match reason",
 	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("TODO: show job", args[0])
+	RunE: func(cmd *cobra.Command, args []string) error {
+		job, err := db.GetJob(args[0])
+		if err != nil {
+			return fmt.Errorf("getting job: %w", err)
+		}
+
+		// Get company name
+		companyName := job.CompanyID
+		c, err := db.GetCompany(job.CompanyID)
+		if err == nil {
+			companyName = c.Name
+		}
+
+		fmt.Printf("Title:       %s\n", job.Title)
+		fmt.Printf("Company:     %s\n", companyName)
+		if job.Location != nil {
+			fmt.Printf("Location:    %s\n", *job.Location)
+		}
+		fmt.Printf("Remote:      %v\n", job.Remote)
+		if job.Department != nil {
+			fmt.Printf("Department:  %s\n", *job.Department)
+		}
+		fmt.Printf("URL:         %s\n", job.URL)
+		fmt.Printf("Status:      %s\n", job.Status)
+
+		if job.MatchScore != nil {
+			fmt.Printf("Match Score: %.0f\n", *job.MatchScore)
+		}
+		if job.MatchReason != nil {
+			fmt.Printf("Match Why:   %s\n", *job.MatchReason)
+		}
+
+		if job.Description != nil {
+			fmt.Printf("\n--- Description ---\n%s\n", *job.Description)
+		}
+
+		return nil
 	},
 }
 
@@ -32,10 +111,27 @@ var jobsOpenCmd = &cobra.Command{
 	Use:	"open",
 	Short:	"Opens the job URL in the default browser",
 	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("TODO: open job", args[0])
+	RunE: func(cmd *cobra.Command, args []string) error {
+		job, err := db.GetJob(args[0])
+		if err != nil {
+			return fmt.Errorf("getting job: %w", err)
+		}
+		fmt.Printf("Opening %s ...\n", job.URL)
+		return openBrowser(job.URL)
 	},
 }
+
+func openBrowser(url string) error {
+	switch runtime.GOOS {
+	case "windows":
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		return exec.Command("open", url).Start()
+	default:
+		return exec.Command("xdg-open", url).Start()
+	}
+}
+
 
 func init() {
 	rootCmd.AddCommand(jobsCmd)
@@ -43,7 +139,7 @@ func init() {
 	jobsCmd.AddCommand(jobsShowCmd)
 	jobsCmd.AddCommand(jobsOpenCmd)
 
-	jobsListCmd.Flags().Int("min-match", 50, "Minimum matching score")
+	jobsListCmd.Flags().Int("min-match", 0, "Minimum matching score")
 	jobsListCmd.Flags().String("company", "", "Company name")
 	jobsListCmd.Flags().Bool("new", false, "New Jobs (only unseen)")
 	jobsListCmd.Flags().Bool("remote", false, "Only show remote jobs")

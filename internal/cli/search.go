@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"os"
 
+	"github.com/Trungsherlock/jobgocli/internal/database"
+	"github.com/Trungsherlock/jobgocli/internal/matcher"
 	"github.com/Trungsherlock/jobgocli/internal/scraper"
 	"github.com/Trungsherlock/jobgocli/internal/worker"
-	"github.com/Trungsherlock/jobgocli/internal/database"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var searchCmd = &cobra.Command{
@@ -60,6 +63,59 @@ var searchCmd = &cobra.Command{
 		registry := scraper.NewRegistry()
 		pool := worker.NewPool(registry, db, 5)
 		results := pool.Run(ctx, filtered)
+
+		profile, err := db.GetProfile()
+		if err != nil {
+			return fmt.Errorf("getting profile: %w", err)
+		}
+
+		if profile != nil {
+			// Get all jobs without a match score
+			unscoredJobs, err := db.ListUnscoredJobs()
+			if err != nil {
+				return fmt.Errorf("listing unscored jobs: %w", err)
+			}
+
+			if len(unscoredJobs) > 0 {
+				fmt.Printf("\nScoring %d new jobs against profile...\n", len(unscoredJobs))
+				var m matcher.Matcher
+				apiKey := viper.GetString("anthropic_api_key")
+				if apiKey == "" {
+					apiKey = os.Getenv("ANTHROPIC_API_KEY")
+				}
+
+				matcherType := viper.GetString("matcher")
+				switch matcherType {
+				case "llm":
+					if apiKey == "" {
+						fmt.Println("No API key found for LLM matcher. Set ANTHROPIC_API_KEY environment variable or use --matcher=keyword")
+						m = matcher.NewKeywordMatcher()
+					} else {
+						m = matcher.NewLLMMatcher(apiKey)
+					}
+				case "hybrid":
+					if apiKey == "" {
+						fmt.Println("No API key found for Hybrid matcher. Set ANTHROPIC_API_KEY environment variable or use --matcher=keyword")
+						m = matcher.NewKeywordMatcher()
+					} else {
+						threshold := viper.GetFloat64("hybrid_threshold")
+						if threshold == 0 {
+							threshold = 50.0
+						}
+						m = matcher.NewHybridMatcher(apiKey, threshold)
+					}
+				default:
+					m = matcher.NewKeywordMatcher()
+				}
+				scored := 0
+				for _, job := range unscoredJobs {
+					result := m.Match(job, *profile)
+					db.UpdateJobMatch(job.ID, result.Score, result.Reason)
+					scored++
+				}
+				fmt.Printf("Scored %d jobs.\n", scored)
+			}
+		}
 
 		var totalNew, failures int
 		for _, r := range results {

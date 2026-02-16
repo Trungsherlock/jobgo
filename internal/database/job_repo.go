@@ -34,25 +34,34 @@ func (d *DB) GetJob(id string) (*Job, error) {
 }
 
 func (d *DB) ListJobs(minScore float64, companyID string, onlyNew bool, onlyRemote bool) ([]Job, error) {
-	query := `SELECT id, company_id, external_id, title, description, location, remote, department, skills, url, posted_at, scraped_at, match_score, match_reason, status, created_at FROM jobs WHERE 1=1`
+	where := "1=1"
 	var args []interface{}
 
 	if minScore > 0 {
-		query += " AND match_score >= ?"
+		where += " AND match_score >= ?"
 		args = append(args, minScore)
 	}
 	if companyID != "" {
-		query += " AND company_id = ?"
+		where += " AND company_id = ?"
 		args = append(args, companyID)
 	}
 	if onlyNew {
-		query += " AND status = 'new'"
+		where += " AND status = 'new'"
 	}
 	if onlyRemote {
-		query += " AND remote = 1"
+		where += " AND remote = 1"
 	}
 
-	query += " ORDER BY match_score DESC, created_at DESC"
+	return d.listJobsWhere(where, args...)
+}
+
+
+func (d *DB) ListUnscoredJobs() ([]Job, error) {
+	return d.listJobsWhere("match_score IS NULL")
+}
+
+func (d *DB) listJobsWhere(where string, args ...interface{}) ([]Job, error) {
+	query := `SELECT id, company_id, external_id, title, description, location, remote, department, skills, url, posted_at, scraped_at, match_score, match_reason, status, created_at FROM jobs WHERE ` + where + ` ORDER BY created_at DESC`
 
 	rows, err := d.Query(query, args...)
 	if err != nil {
