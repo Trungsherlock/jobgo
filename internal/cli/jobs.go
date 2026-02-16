@@ -132,15 +132,43 @@ func openBrowser(url string) error {
 	}
 }
 
+var jobsUpdateCmd = &cobra.Command{
+	Use:   "update [id]",
+	Short: "Update job application status",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		status, _ := cmd.Flags().GetString("status")
+		notes, _ := cmd.Flags().GetString("notes")
+
+		if status == "" {
+			return fmt.Errorf("--status is required")
+		}
+
+		job, err := db.GetJob(args[0])
+		if err != nil {
+			return fmt.Errorf("finding job: %w", err)
+		}
+
+		if err := db.UpdateApplication(job.ID, status, notes); err != nil {
+			return fmt.Errorf("updating: %w", err)
+		}
+
+		fmt.Printf("Updated %s to status: %s\n", job.Title, status)
+		return nil
+	},
+}
 
 func init() {
 	rootCmd.AddCommand(jobsCmd)
 	jobsCmd.AddCommand(jobsListCmd)
 	jobsCmd.AddCommand(jobsShowCmd)
 	jobsCmd.AddCommand(jobsOpenCmd)
+	jobsCmd.AddCommand(jobsUpdateCmd)
 
 	jobsListCmd.Flags().Int("min-match", 0, "Minimum matching score")
 	jobsListCmd.Flags().String("company", "", "Company name")
 	jobsListCmd.Flags().Bool("new", false, "New Jobs (only unseen)")
 	jobsListCmd.Flags().Bool("remote", false, "Only show remote jobs")
+	jobsUpdateCmd.Flags().String("status", "", "New status (applied, phone_screen, interview, offer, rejected)")
+	jobsUpdateCmd.Flags().String("notes", "", "Notes")
 }
