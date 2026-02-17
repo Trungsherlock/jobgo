@@ -33,7 +33,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v7
         with:
-          version: v1.2
+          version: v2.9.0
 
   build:
     needs: [test, lint]
