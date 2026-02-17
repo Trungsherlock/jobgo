@@ -25,7 +25,7 @@ func setupTestDB(t *testing.T) *DB {
 		t.Fatalf("failed to run migrations: %v", err)
 	}
 
-	t.Cleanup(func() { db.Close() })
+	t.Cleanup(func() { _ = db.Close() })
 	return db
 }
 

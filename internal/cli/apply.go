@@ -59,15 +59,15 @@ var statusCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "STATUS\tCOUNT")
+		_, _ = fmt.Fprintln(w, "STATUS\tCOUNT")
 		total := 0
 		for _, s := range summaries {
-			fmt.Fprintf(w, "%s\t%d\n", s.Status, s.Count)
+			_, _ = fmt.Fprintf(w, "%s\t%d\n", s.Status, s.Count)
 			total += s.Count
 		}
-		fmt.Fprintf(w, "---\t---\n")
-		fmt.Fprintf(w, "total\t%d\n", total)
-		w.Flush()
+		_, _ = fmt.Fprintf(w, "---\t---\n")
+		_, _ = fmt.Fprintf(w, "total\t%d\n", total)
+		_ = w.Flush()
 		return nil
 	},
 }

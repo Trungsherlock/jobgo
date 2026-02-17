@@ -67,7 +67,7 @@ func (d *DB) listJobsWhere(where string, args ...interface{}) ([]Job, error) {
 	if err != nil {
 		return nil, fmt.Errorf("listing jobs: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var jobs []Job
 	for rows.Next() {

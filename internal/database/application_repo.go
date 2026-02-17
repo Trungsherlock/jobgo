@@ -16,7 +16,7 @@ func (d *DB) CreateApplication(jobID, notes string) (*Application, error) {
 		return nil, fmt.Errorf("creating application: %w", err)
 	}
 
-	d.Exec(`UPDATE jobs SET status = 'applied' WHERE id = ?`, jobID)
+	_, _ = d.Exec(`UPDATE jobs SET status = 'applied' WHERE id = ?`, jobID)
 
 	return d.GetApplication(id)
 }
@@ -54,7 +54,7 @@ func (d *DB) GetApplicationSummary() ([]StatusSummary, error) {
 	if err != nil {
 		return nil, fmt.Errorf("getting summary: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var summaries []StatusSummary
 	for rows.Next() {

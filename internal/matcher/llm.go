@@ -150,7 +150,7 @@ func (l *LLMMatcher) callAPI(ctx context.Context, job database.Job, profile data
 	if err != nil {
 		return MatchResult{}, fmt.Errorf("calling Claude API: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var claudeResp claudeResponse
 	if err := json.NewDecoder(resp.Body).Decode(&claudeResp); err != nil {
@@ -182,8 +182,5 @@ func (l *LLMMatcher) callAPI(ctx context.Context, job database.Job, profile data
 		matchResp.Score = 100
 	}
 
-	return MatchResult{
-		Score:  matchResp.Score,
-		Reason: matchResp.Reason,
-	}, nil
+	return MatchResult(matchResp), nil
 }

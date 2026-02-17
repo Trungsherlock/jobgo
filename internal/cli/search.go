@@ -110,7 +110,7 @@ var searchCmd = &cobra.Command{
 				scored := 0
 				for _, job := range unscoredJobs {
 					result := m.Match(job, *profile)
-					db.UpdateJobMatch(job.ID, result.Score, result.Reason)
+					_ = db.UpdateJobMatch(job.ID, result.Score, result.Reason)
 					scored++
 				}
 				fmt.Printf("Scored %d jobs.\n", scored)

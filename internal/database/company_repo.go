@@ -34,7 +34,7 @@ func (d *DB) ListCompanies() ([]Company, error) {
 	if err != nil {
 		return nil, fmt.Errorf("listing companies: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var companies []Company
 	for rows.Next() {

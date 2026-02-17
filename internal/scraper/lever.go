@@ -59,7 +59,7 @@ func (l *LeverScraper) FetchJobs(ctx context.Context, slug string) ([]RawJob, er
 	if err != nil {
 		return nil, fmt.Errorf("fetching lever postings: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("lever API returned status %d", resp.StatusCode)

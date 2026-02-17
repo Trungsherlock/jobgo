@@ -42,7 +42,7 @@ var jobsListCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tSCORE\tTITLE\tCOMPANY\tLOCATION\tSTATUS")
+		_, _ = fmt.Fprintln(w, "ID\tSCORE\tTITLE\tCOMPANY\tLOCATION\tSTATUS")
 		for _, j := range jobs {
 			id := j.ID
 			score := "-"
@@ -63,9 +63,9 @@ var jobsListCmd = &cobra.Command{
 				companyName = c.Name
 			}
 
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", id, score, title, companyName, location, j.Status)
+			_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", id, score, title, companyName, location, j.Status)
 		}
-		w.Flush()
+		_ = w.Flush()
 		fmt.Printf("\n%d jobs total\n", len(jobs))
 		return nil
 	},

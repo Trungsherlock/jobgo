@@ -103,7 +103,7 @@ func (p *Pool) scrapeCompany(ctx context.Context, company database.Company) Resu
 		}
 	}
 
-	p.db.UpdateCompanyLastScraped(company.ID)
+	_ = p.db.UpdateCompanyLastScraped(company.ID)
 	return Result{
 		Company: company,
 		JobCount: newCount,

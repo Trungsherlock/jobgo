@@ -134,6 +134,6 @@ func parseJSONArray(s string) []string {
 	if s == "" {
 		return nil
 	}
-	json.Unmarshal([]byte(s), &arr)
+	_ = json.Unmarshal([]byte(s), &arr)
 	return arr
 }

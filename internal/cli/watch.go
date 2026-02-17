@@ -115,7 +115,7 @@ func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifi
 		m := matcher.NewKeywordMatcher()
 		for _, job := range unscoredJobs {
 			result := m.Match(job, *profile)
-			db.UpdateJobMatch(job.ID, result.Score, result.Reason)
+			_ = db.UpdateJobMatch(job.ID, result.Score, result.Reason)
 		}
 	}
 
@@ -133,7 +133,7 @@ func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifi
                 companyName = c.Name
             }
             for _, n := range notifiers {
-                n.Notify(j, companyName, score)
+                _ = n.Notify(j, companyName, score)
             }
         }
     }

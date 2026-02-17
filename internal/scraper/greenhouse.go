@@ -57,7 +57,7 @@ func (g * GreenhouseScraper) FetchJobs(ctx context.Context, slug string) ([]RawJ
 	if err != nil {
 		return nil, fmt.Errorf("fetching greenhouse jobs: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var jobList greenhouseJobList
 	if err := json.NewDecoder(resp.Body).Decode(&jobList); err != nil {
@@ -73,10 +73,10 @@ func (g * GreenhouseScraper) FetchJobs(ctx context.Context, slug string) ([]RawJ
 	if err != nil {
 		return nil, fmt.Errorf("fetching greenhouse jobs with content: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusOK {
-		json.NewDecoder(resp.Body).Decode(&jobList)
+		_ = json.NewDecoder(resp.Body).Decode(&jobList)
 	}
 
 	jobs := make([]RawJob, 0, len(jobList.JobList))

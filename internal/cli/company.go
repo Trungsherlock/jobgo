@@ -65,15 +65,15 @@ var companyListCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tNAME\tPLATFORM\tSLUG\tLAST SCRAPED")
+		_, _ = fmt.Fprintln(w, "ID\tNAME\tPLATFORM\tSLUG\tLAST SCRAPED")
 		for _, c := range companies {
 			lastScraped := "never"
 			if c.LastScrapedAt != nil {
 				lastScraped = c.LastScrapedAt.Format("2006-01-02 15:04")
 			}
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", c.ID[:8], c.Name, c.Platform, c.Slug, lastScraped)
+			_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", c.ID[:8], c.Name, c.Platform, c.Slug, lastScraped)
 		}
-		w.Flush()
+		_ = w.Flush()
 		return nil
 	},
 }

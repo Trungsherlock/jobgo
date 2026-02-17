@@ -81,12 +81,12 @@ func (d *DB) Migrate(migrationsDir string) error {
 		}
 
 		if _, err := tx.Exec(string(content)); err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return fmt.Errorf("applying migration %s: %w", f, err)
 		}
 
 		if _, err := tx.Exec("INSERT INTO schema_migrations (filename) VALUES (?)", f); err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return fmt.Errorf("recording migration %s: %w", f, err)
 		}
 
