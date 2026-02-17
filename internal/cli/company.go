@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"text/tabwriter"
+	"encoding/json"
 
 	"github.com/spf13/cobra"
 )
@@ -53,6 +54,13 @@ var companyListCmd = &cobra.Command{
 
 		if len(companies) == 0 {
 			fmt.Println("No companies tracked yet. Add one with: jobgo company add")
+			return nil
+		}
+
+		output, _ := cmd.Flags().GetString("output")
+		if output == "json" {
+			data, _ := json.MarshalIndent(companies, "", "  ")
+			fmt.Println(string(data))
 			return nil
 		}
 

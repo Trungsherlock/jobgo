@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"text/tabwriter"
+	"encoding/json"
 
 	"github.com/spf13/cobra"
 )
@@ -47,6 +48,13 @@ var statusCmd = &cobra.Command{
 
 		if len(summaries) == 0 {
 			fmt.Println("No applications yet. Apply with: jobgo apply <job-id>")
+			return nil
+		}
+
+		output, _ := cmd.Flags().GetString("output")
+		if output == "json" {
+			data, _ := json.MarshalIndent(summaries, "", "  ")
+			fmt.Println(string(data))
 			return nil
 		}
 

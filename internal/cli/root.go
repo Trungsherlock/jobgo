@@ -75,6 +75,7 @@ func init() {
 	rootCmd.PersistentFlags().String("config", "", "config file (default is $HOME/.jobgo/config.yaml)")
 	rootCmd.PersistentFlags().Bool("verbose", false, "enable verbose output")
 	rootCmd.PersistentFlags().Bool("debug", false, "enable debug output")
+	rootCmd.PersistentFlags().StringP("output", "o", "table", "Output format (table, json)")
 }
 
 func initConfig() {

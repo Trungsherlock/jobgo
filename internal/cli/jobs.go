@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 	"text/tabwriter"
+	"encoding/json"
 
 	"github.com/spf13/cobra"
 )
@@ -30,6 +31,13 @@ var jobsListCmd = &cobra.Command{
 		}	
 		if len(jobs) == 0 {
 			fmt.Println("No jobs found matching the criteria.")
+			return nil
+		}
+
+		output, _ := cmd.Flags().GetString("output")
+		if output == "json" {
+			data, _ := json.MarshalIndent(jobs, "", "  ")
+			fmt.Println(string(data))
 			return nil
 		}
 
