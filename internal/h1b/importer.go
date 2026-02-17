@@ -36,7 +36,7 @@ func ImportSponsors(db *database.DB, filePath string) (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("opening file: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	// Decode UTF-16 LE (USCIS files use this encoding)
 	utf16Decoder := unicode.UTF16(unicode.LittleEndian, unicode.UseBOM)

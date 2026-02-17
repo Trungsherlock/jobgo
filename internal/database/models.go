@@ -34,9 +34,9 @@ type Job struct {
 	MatchReason		*string
 	Status			string
 	CreatedAt		time.Time
-	ExperienceLevel	string
+	ExperienceLevel	*string
 	VisaMentioned	bool
-	VisaSentiment	string
+	VisaSentiment	*string
 	IsNewGrad		bool
 }
 
@@ -53,7 +53,7 @@ type Profile struct {
 	CreatedAt			time.Time
 	UpdatedAt			time.Time
 	VisaRequired		bool
-	ExperienceLevel		string
+	ExperienceLevel		*string
 }
 
 type Application struct {
