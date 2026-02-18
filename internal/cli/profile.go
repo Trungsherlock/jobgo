@@ -42,6 +42,7 @@ var profileShowCmd = &cobra.Command{
 		fmt.Printf("Preferred Roles:    %s\n", p.PreferredRoles)
 		fmt.Printf("Preferred Locations:%s\n", p.PreferredLocations)
 		fmt.Printf("Min Match Score:    %.0f\n", p.MinMatchScore)
+		fmt.Printf("Visa Required:      %v\n", p.VisaRequired)
 		return nil
 	},
 }
@@ -85,6 +86,10 @@ var profileSetCmd = &cobra.Command{
 			p.MinMatchScore, _ = cmd.Flags().GetFloat64("min-match")
 		}
 
+		if cmd.Flags().Changed("visa") {
+    		p.VisaRequired, _ = cmd.Flags().GetBool("visa")
+		}
+
 		if err := db.UpsertProfile(p); err != nil {
 			return fmt.Errorf("saving profile: %w", err)
 		}
@@ -120,4 +125,5 @@ func init() {
 	profileSetCmd.Flags().String("locations", "", "Comma-separated preferred locations")
 	profileSetCmd.Flags().Int("experience", 0, "Years of experience")
 	profileSetCmd.Flags().Float64("min-match", 50.0, "Minimum match score for notifications")
+	profileSetCmd.Flags().Bool("visa", false, "Require H1B visa sponsorship")
 }

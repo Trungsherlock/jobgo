@@ -7,8 +7,8 @@ import (
 
 func (d *DB) UpsertProfile(p *Profile) error {
 	_, err := d.Exec(
-		`INSERT INTO profile (id, name, email, skills, experience_years, preferred_roles, preferred_locations, min_match_score, resume_raw, updated_at)
-		 VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+		`INSERT INTO profile (id, name, email, skills, experience_years, preferred_roles, preferred_locations, min_match_score, resume_raw, visa_required, updated_at)
+		 VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 		 ON CONFLICT(id) DO UPDATE SET
 		   name = excluded.name,
 		   email = excluded.email,
@@ -18,8 +18,9 @@ func (d *DB) UpsertProfile(p *Profile) error {
 		   preferred_locations = excluded.preferred_locations,
 		   min_match_score = excluded.min_match_score,
 		   resume_raw = excluded.resume_raw,
+		   visa_required = excluded.visa_required,
 		   updated_at = CURRENT_TIMESTAMP`,
-		p.Name, p.Email, p.Skills, p.ExperienceYears, p.PreferredRoles, p.PreferredLocations, p.MinMatchScore, p.ResumeRaw,
+		p.Name, p.Email, p.Skills, p.ExperienceYears, p.PreferredRoles, p.PreferredLocations, p.MinMatchScore, p.ResumeRaw, p.VisaRequired,
 	)
 	return err
 }

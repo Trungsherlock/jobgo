@@ -114,6 +114,44 @@ var searchCmd = &cobra.Command{
 					_ = db.UpdateJobMatch(job.ID, result.Score, result.Reason)
 					scored++
 				}
+
+				if profile.VisaRequired {
+					allJobs, _ := db.ListJobs(0, "", false, false)
+					adjusted := 0
+					for _, job := range allJobs {
+						company, err := db.GetCompany(job.CompanyID)
+						if err != nil {
+							continue
+						}
+						adj := h1b.ScoreH1B(job, *company, *profile)
+						if adj.Delta != 0 {
+							newScore := 0.0
+							if job.MatchScore != nil {
+								newScore = *job.MatchScore
+							}
+							newScore += adj.Delta
+							if newScore < 0 {
+								newScore = 0
+							}
+							if newScore > 100 {
+								newScore = 100
+							}
+							reason := ""
+							if job.MatchReason != nil {
+								reason = *job.MatchReason
+							}
+							if adj.Reason != "" {
+								reason += " | " + adj.Reason
+							}
+							_ = db.UpdateJobMatch(job.ID, newScore, reason)
+							adjusted++
+						}
+					}
+					if adjusted > 0 {
+						fmt.Printf("Applied H1B adjustments to %d jobs.\n", adjusted)
+					}
+				}
+
 				fmt.Printf("Scored %d jobs.\n", scored)
 			}
 			unclassified, _ := db.ListUnclassifiedJobs()
