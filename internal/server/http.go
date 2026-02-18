@@ -55,7 +55,7 @@ func (s *Server) listJobs(w http.ResponseWriter, r *http.Request) {
 	onlyNew := r.URL.Query().Get("new") == "true"
 	onlyRemote := r.URL.Query().Get("remote") == "true"
 
-	jobs, err := s.db.ListJobs(minScore, companyID, onlyNew, onlyRemote)
+	jobs, err := s.db.ListJobs(minScore, companyID, onlyNew, onlyRemote, false, false)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return

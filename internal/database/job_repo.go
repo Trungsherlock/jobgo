@@ -33,7 +33,7 @@ func (d *DB) GetJob(id string) (*Job, error) {
 	return j, nil
 }
 
-func (d *DB) ListJobs(minScore float64, companyID string, onlyNew bool, onlyRemote bool) ([]Job, error) {
+func (d *DB) ListJobs(minScore float64, companyID string, onlyNew bool, onlyRemote bool, onlyVisaFriendly bool, onlyNewGrad bool) ([]Job, error) {
 	where := "1=1"
 	var args []interface{}
 
@@ -50,6 +50,13 @@ func (d *DB) ListJobs(minScore float64, companyID string, onlyNew bool, onlyRemo
 	}
 	if onlyRemote {
 		where += " AND remote = 1"
+	}
+	if onlyVisaFriendly {
+		where += " AND (visa_sentiment = 'positive' OR visa_sentiment IS NULL OR visa_sentiment != 'negative')"
+		where += " AND company_id IN (SELECT id FROM companies WHERE sponsors_h1b = 1)"
+	}
+	if onlyNewGrad {
+		where += " AND is_new_grad = 1"
 	}
 
 	return d.listJobsWhere(where, args...)

@@ -75,7 +75,7 @@ func TestJobCRUD(t *testing.T) {
 	}
 
 	// List with filters
-	jobs, err := db.ListJobs(0, "", false, true)
+	jobs, err := db.ListJobs(0, "", false, true, false, false)
 	if err != nil {
 		t.Fatalf("ListJobs: %v", err)
 	}
@@ -93,7 +93,7 @@ func TestJobCRUD(t *testing.T) {
 	}
 
 	// Verify new jobs filter excludes it
-	newJobs, _ := db.ListJobs(0, "", true, false)
+	newJobs, _ := db.ListJobs(0, "", true, false, false, false)
 	if len(newJobs) != 0 {
 		t.Errorf("got %d new jobs after status change, want 0", len(newJobs))
 	}

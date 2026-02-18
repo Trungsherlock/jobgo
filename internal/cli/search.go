@@ -116,7 +116,7 @@ var searchCmd = &cobra.Command{
 				}
 
 				if profile.VisaRequired {
-					allJobs, _ := db.ListJobs(0, "", false, false)
+					allJobs, _ := db.ListJobs(0, "", false, false, false, false)
 					adjusted := 0
 					for _, job := range allJobs {
 						company, err := db.GetCompany(job.CompanyID)

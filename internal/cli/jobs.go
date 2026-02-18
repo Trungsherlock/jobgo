@@ -24,8 +24,11 @@ var jobsListCmd = &cobra.Command{
 		company, _ := cmd.Flags().GetString("company")
 		onlyNew, _ := cmd.Flags().GetBool("new")
 		onlyRemote, _ := cmd.Flags().GetBool("remote")
+		visaFriendly, _ := cmd.Flags().GetBool("visa-friendly")
+		newGrad, _ := cmd.Flags().GetBool("new-grad")
 
-		jobs, err := db.ListJobs(float64(minMatch), company, onlyNew, onlyRemote)
+
+		jobs, err := db.ListJobs(float64(minMatch), company, onlyNew, onlyRemote, visaFriendly, newGrad)
 		if err != nil {
 			return fmt.Errorf("listing jobs: %w", err)
 		}	
@@ -111,6 +114,15 @@ var jobsShowCmd = &cobra.Command{
 			fmt.Printf("\n--- Description ---\n%s\n", *job.Description)
 		}
 
+		if job.ExperienceLevel != nil {
+			fmt.Printf("Experience Level: %s\n", *job.ExperienceLevel)
+		}
+		fmt.Printf("New Grad:         %v\n", job.IsNewGrad)
+		fmt.Printf("Visa Mentioned:   %v\n", job.VisaMentioned)
+		if job.VisaSentiment != nil {
+			fmt.Printf("Visa Sentiment:   %s\n", *job.VisaSentiment)
+		}
+
 		return nil
 	},
 }
@@ -177,6 +189,8 @@ func init() {
 	jobsListCmd.Flags().String("company", "", "Company name")
 	jobsListCmd.Flags().Bool("new", false, "New Jobs (only unseen)")
 	jobsListCmd.Flags().Bool("remote", false, "Only show remote jobs")
+	jobsListCmd.Flags().Bool("visa-friendly", false, "Only show jobs from H1B sponsors (no negative visa sentiment)")
+	jobsListCmd.Flags().Bool("new-grad", false, "Only show new-grad friendly jobs")
 	jobsUpdateCmd.Flags().String("status", "", "New status (applied, phone_screen, interview, offer, rejected)")
 	jobsUpdateCmd.Flags().String("notes", "", "Notes")
 }

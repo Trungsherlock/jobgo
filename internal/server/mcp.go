@@ -79,7 +79,7 @@ func (m *MCPServer) searchJobs(ctx context.Context, req mcp.CallToolRequest) (*m
 	remoteOnly, _ := args["remote_only"].(bool)
 	newOnly, _ := args["new_only"].(bool)
 
-	jobs, err := m.db.ListJobs(minScore, "", newOnly, remoteOnly)
+	jobs, err := m.db.ListJobs(minScore, "", newOnly, remoteOnly, false, false)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}

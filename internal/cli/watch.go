@@ -121,7 +121,7 @@ func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifi
 
 	// Print new high-match jobs
 	if totalNew > 0 && profile != nil {
-        highMatches, _ := db.ListJobs(minScore, "", true, false)
+        highMatches, _ := db.ListJobs(minScore, "", true, false, false, false)
         for _, j := range highMatches {
             score := 0.0
             if j.MatchScore != nil {
