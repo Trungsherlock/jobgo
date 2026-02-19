@@ -7,6 +7,8 @@ import (
 	"strconv"
 
 	"github.com/Trungsherlock/jobgocli/internal/database"
+	"github.com/Trungsherlock/jobgocli/internal/scraper"
+	"github.com/Trungsherlock/jobgocli/internal/worker"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -38,7 +40,10 @@ func (s *Server) setupRoutes() {
 		r.Get("/stats", s.getStats)
 		r.Get("/h1b/sponsors", s.listSponsors)
 		r.Get("/h1b/status", s.h1bStatus)
-
+		r.Get("/jobcart", s.listCart)
+		r.Post("/jobcart/{id}", s.addToCart)
+		r.Delete("/jobcart/{id}", s.removeFromCart)
+		r.Post("/jobcart/scan", s.scanCart)
 	})
 
 	s.router = r
@@ -140,6 +145,62 @@ func (s *Server) getStats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, summaries)
+}
+
+func (s *Server) listCart(w http.ResponseWriter, r *http.Request) {
+	companies, err := s.db.ListCartCompanies()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, companies)
+}
+
+func (s *Server) addToCart(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if err := s.db.AddToCart(id); err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "added"})
+}
+
+func (s *Server) removeFromCart(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if err := s.db.RemoveFromCart(id); err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "removed"})
+}
+
+func (s *Server) scanCart(w http.ResponseWriter, r *http.Request) {
+	companies, err := s.db.ListCartCompanies()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if len(companies) == 0 {
+		writeJSON(w, http.StatusOK, map[string]string{"status": "no companies in cart"})
+		return
+	}
+
+	registry := scraper.NewRegistry()
+	pool := worker.NewPool(registry, s.db, 5)
+	results := pool.Run(r.Context(), companies)
+
+	totalNew := 0
+	for _, res := range results {
+		if res.Err == nil {
+			totalNew += res.JobCount
+		}
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"status":		"ok",
+		"new_jobs":		totalNew,
+		"companies":	len(companies),
+	})
 }
 
 // --- Helpers ---

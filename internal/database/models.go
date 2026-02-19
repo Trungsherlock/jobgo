@@ -15,6 +15,9 @@ type Company struct {
 	SponsorsH1b		bool
 	H1bApprovalRate	*float64
 	H1bTotalFiled	*int
+	InCart			bool
+	CartAddedAt		*time.Time
+	LastNotifiedAt	*time.Time
 }
 
 type Job struct {
