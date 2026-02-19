@@ -1,0 +1,101 @@
+name,platform,slug
+Netflix,lever,netflix
+Atlassian,lever,atlassian
+Xero,lever,xero
+Zoox,lever,zoox
+Shield AI,lever,shieldai
+Calm,lever,calm
+Robinhood,lever,robinhood
+Carta,lever,carta
+Brex,lever,brex
+Canva,lever,canva
+Hopper,lever,hopper
+Loom,lever,loom
+Benchling,lever,benchling
+Verkada,lever,verkada
+Superhuman,lever,superhuman
+Scale AI,lever,scaleai
+Anduril,lever,anduril
+Samsara,lever,samsara
+Rippling,lever,rippling
+Lattice,lever,lattice
+Navan,lever,navan
+Zip,lever,zip
+Notion,lever,notion
+Snyk,lever,snyk
+Harness,lever,harness
+Weights & Biases,lever,wandb
+Cohere,lever,cohere
+Airtable,lever,airtable
+Hex,lever,hex
+Miro,lever,miro
+Faire,lever,faire
+Tempus,lever,tempus
+Color Health,lever,color
+Collective Health,lever,collectivehealth
+Relativity,lever,relativity
+Veeva Systems,lever,veeva
+Talkdesk,lever,talkdesk
+Contentful,lever,contentful
+Amplitude,lever,amplitude
+Figma,lever,figma
+Stripe,lever,stripe
+Duolingo,lever,duolingo
+Ci&T,lever,cit
+Rackspace,lever,rackspace
+Dun & Bradstreet,lever,dnb
+McGraw-Hill,lever,mcgrawhill
+Edelman,lever,edelman
+Brainware,lever,brainware
+Benchmarks,lever,benchmarks
+Persona,lever,persona
+Airbnb,greenhouse,airbnb
+Dropbox,greenhouse,dropbox
+HubSpot,greenhouse,hubspot
+Figma,greenhouse,figma
+SpaceX,greenhouse,spacex
+Neuralink,greenhouse,neuralink
+DeepMind,greenhouse,deepmind
+Coinbase,greenhouse,coinbase
+DoorDash,greenhouse,doordash
+Lyft,greenhouse,lyft
+Pinterest,greenhouse,pinterest
+Instacart,greenhouse,instacart
+Robinhood,greenhouse,robinhood
+Plaid,greenhouse,plaid
+Chime,greenhouse,chime
+Twilio,greenhouse,twilio
+Datadog,greenhouse,datadog
+MongoDB,greenhouse,mongodb
+Okta,greenhouse,okta
+PagerDuty,greenhouse,pagerduty
+HashiCorp,greenhouse,hashicorp
+Confluent,greenhouse,confluent
+Databricks,greenhouse,databricks
+Snowflake,greenhouse,snowflake
+Palantir,greenhouse,palantir
+Oscar Health,greenhouse,oscar
+Ro,greenhouse,ro
+Hims & Hers,greenhouse,himshers
+Etsy,greenhouse,etsy
+Squarespace,greenhouse,squarespace
+Zendesk,greenhouse,zendesk
+Intercom,greenhouse,intercom
+Asana,greenhouse,asana
+Coursera,greenhouse,coursera
+Duolingo,greenhouse,duolingo
+Peloton,greenhouse,peloton
+Waymo,greenhouse,waymo
+Cruise,greenhouse,cruise
+Rivian,greenhouse,rivian
+Lucid Motors,greenhouse,lucidmotors
+Moloco,greenhouse,moloco
+Yext,greenhouse,yext
+SpotOn,greenhouse,spoton
+Guidepoint,greenhouse,guidepoint
+BuzzFeed,greenhouse,buzzfeed
+Discord,greenhouse,discord
+Roblox,greenhouse,roblox
+Unity,greenhouse,unity
+Epic Games,greenhouse,epicgames
+Twitch,greenhouse,twitch

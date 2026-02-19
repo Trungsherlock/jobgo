@@ -1,10 +1,13 @@
 package cli
 
 import (
-	"fmt"
-	"os"
-	"text/tabwriter"
+	"encoding/csv"
 	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+	"strings"
+	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 )
@@ -36,10 +39,56 @@ var companyAddCmd = &cobra.Command{
 }
 
 var companyImportCmd = &cobra.Command{
-	Use:   "import",
-	Short: "Bulk import companies from a YAML file",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("TODO: import companies")
+	Use:   "import <csv-file>",
+	Short: "Bulk import companies from a CSV file (columns: name,platform,slug)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		f, err := os.Open(args[0])
+		if err != nil {
+			return fmt.Errorf("opening file: %w", err)
+		}
+		defer f.Close()
+
+		reader := csv.NewReader(f)
+		reader.TrimLeadingSpace = true
+
+		// Skip header row
+		if _, err := reader.Read(); err != nil {
+			return fmt.Errorf("reading header: %w", err)
+		}
+
+		added, skipped := 0, 0
+		for {
+			record, err := reader.Read()
+			if err == io.EOF {
+				break
+			}
+			if err != nil || len(record) < 3 {
+				skipped++
+				continue
+			}
+
+			name := strings.TrimSpace(record[0])
+			platform := strings.TrimSpace(record[1])
+			slug := strings.TrimSpace(record[2])
+
+			if name == "" || platform == "" || slug == "" {
+				skipped++
+				continue
+			}
+
+			_, err = db.CreateCompany(name, platform, slug, "")
+			if err != nil {
+				fmt.Printf("  SKIP  %s: %v\n", name, err)
+				skipped++
+				continue
+			}
+			fmt.Printf("  OK    %s (%s/%s)\n", name, platform, slug)
+			added++
+		}
+
+		fmt.Printf("\nImported %d companies, skipped %d.\n", added, skipped)
+		return nil
 	},
 }
 
@@ -101,5 +150,4 @@ func init() {
 	companyAddCmd.Flags().String("name", "", "Company name")
 	companyAddCmd.Flags().String("platform", "", "ATS platform (lever, greenhouse)")
 	companyAddCmd.Flags().String("slug", "", "Platform slug")
-	companyImportCmd.Flags().String("file", "", "Path to companies YAML file")
 }
