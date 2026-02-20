@@ -3,44 +3,45 @@ package database
 import "time"
 
 type Company struct {
-	ID				string
-	Name			string
-	Platform		string
-	Slug			string
-	CareerURL		string
-	Enabled			bool
-	LastScrapedAt	*time.Time
-	CreatedAt		time.Time
-	H1bSponsorID	*string
-	SponsorsH1b		bool
-	H1bApprovalRate	*float64
-	H1bTotalFiled	*int
-	InCart			bool
-	CartAddedAt		*time.Time
-	LastNotifiedAt	*time.Time
+	ID				string		`json:"id"`
+	Name			string		`json:"name"`
+	Platform		string		`json:"platform"`
+	Slug			string		`json:"slug"`
+	CareerURL		string		`json:"career_url"`
+	Enabled			bool		`json:"enabled"`
+	LastScrapedAt	*time.Time	`json:"last_scraped_at"`
+	CreatedAt		time.Time	`json:"created_at"`
+	H1bSponsorID	*string		`json:"h1b_sponsor_id"`
+	SponsorsH1b		bool		`json:"sponsors_h1b"`
+	H1bApprovalRate	*float64	`json:"h1b_approval_rate"`
+	H1bTotalFiled	*int		`json:"h1b_total_filed"`
+	InCart			bool		`json:"in_cart"`
+	CartAddedAt		*time.Time	`json:"cart_added_at"`
+	LastNotifiedAt	*time.Time	`json:"last_notified_at"`
 }
 
 type Job struct {
-	ID				string
-	CompanyID		string
-	ExternalID		*string
-	Title			string
-	Description		*string
-	Location		*string
-	Remote			bool
-	Department		*string
-	Skills			*string
-	URL				string
-	PostedAt		*time.Time
-	ScrapedAt		*time.Time
-	MatchScore		*float64
-	MatchReason		*string
-	Status			string
-	CreatedAt		time.Time
-	ExperienceLevel	*string
-	VisaMentioned	bool
-	VisaSentiment	*string
-	IsNewGrad		bool
+	ID				string		`json:"id"`
+	CompanyID		string		`json:"company_id"`
+	CompanyName		string		`json:"company_name"`
+	ExternalID		*string		`json:"external_id"`
+	Title			string		`json:"title"`
+	Description		*string		`json:"description"`
+	Location		*string		`json:"location"`
+	Remote			bool		`json:"remote"`
+	Department		*string		`json:"department"`
+	Skills			*string		`json:"skills"`
+	URL				string		`json:"url"`
+	PostedAt		*time.Time	`json:"posted_at"`
+	ScrapedAt		*time.Time	`json:"scraped_at"`
+	MatchScore		*float64	`json:"match_score"`
+	MatchReason		*string		`json:"match_reason"`
+	Status			string		`json:"status"`
+	CreatedAt		time.Time	`json:"created_at"`
+	ExperienceLevel	*string		`json:"experience_level"`
+	VisaMentioned	bool		`json:"visa_mentioned"`
+	VisaSentiment	*string		`json:"visa_sentiment"`
+	IsNewGrad		bool		`json:"is_new_grad"`
 }
 
 type Profile struct {

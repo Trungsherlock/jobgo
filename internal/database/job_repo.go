@@ -24,9 +24,9 @@ func (d *DB) CreateJob(companyID, externalID, title, description, location, depa
 func (d *DB) GetJob(id string) (*Job, error) {
 	j := &Job{}
 	err := d.QueryRow(
-		`SELECT id, company_id, external_id, title, description, location, remote, department, skills, url, posted_at, scraped_at, match_score, match_reason, status, created_at, experience_level, visa_mentioned, visa_sentiment, is_new_grad
-		 FROM jobs WHERE id = ?`, id,
-	).Scan(&j.ID, &j.CompanyID, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, &j.PostedAt, &j.ScrapedAt, &j.MatchScore, &j.MatchReason, &j.Status, &j.CreatedAt, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad)
+		`SELECT j.id, j.company_id, COALESCE(c.name, '') as company_name, j.external_id, j.title, j.description, j.location, j.remote, j.department, j.skills, j.url, j.posted_at, j.scraped_at, j.match_score, j.match_reason, j.status, j.created_at, j.experience_level, j.visa_mentioned, j.visa_sentiment, j.is_new_grad
+		 FROM jobs j LEFT JOIN companies c ON j.company_id = c.id WHERE j.id = ?`, id,
+	).Scan(&j.ID, &j.CompanyID, &j.CompanyName, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, &j.PostedAt, &j.ScrapedAt, &j.MatchScore, &j.MatchReason, &j.Status, &j.CreatedAt, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad)
 	if err != nil {
 		return nil, fmt.Errorf("getting job: %w", err)
 	}
@@ -68,7 +68,9 @@ func (d *DB) ListUnscoredJobs() ([]Job, error) {
 }
 
 func (d *DB) listJobsWhere(where string, args ...interface{}) ([]Job, error) {
-	query := `SELECT id, company_id, external_id, title, description, location, remote, department, skills, url, posted_at, scraped_at, match_score, match_reason, status, created_at, experience_level, visa_mentioned, visa_sentiment, is_new_grad FROM jobs WHERE ` + where + ` ORDER BY created_at DESC`
+	query := `SELECT j.id, j.company_id, COALESCE(c.name, '') as company_name, j.external_id, j.title, j.description, j.location, j.remote, j.department, j.skills, j.url, j.posted_at, j.scraped_at, j.match_score, j.match_reason, j.status, j.created_at, j.experience_level, j.visa_mentioned, j.visa_sentiment, j.is_new_grad
+	FROM jobs j LEFT JOIN companies c ON j.company_id = c.id
+	WHERE ` + where + ` ORDER BY j.created_at DESC`
 
 	rows, err := d.Query(query, args...)
 	if err != nil {
@@ -79,7 +81,7 @@ func (d *DB) listJobsWhere(where string, args ...interface{}) ([]Job, error) {
 	var jobs []Job
 	for rows.Next() {
 		var j Job
-		if err := rows.Scan(&j.ID, &j.CompanyID, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, &j.PostedAt, &j.ScrapedAt, &j.MatchScore, &j.MatchReason, &j.Status, &j.CreatedAt, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad); err != nil {
+		if err := rows.Scan(&j.ID, &j.CompanyID, &j.CompanyName, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, &j.PostedAt, &j.ScrapedAt, &j.MatchScore, &j.MatchReason, &j.Status, &j.CreatedAt, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad); err != nil {
 			return nil, fmt.Errorf("scanning job: %w", err)
 		}
 		jobs = append(jobs, j)

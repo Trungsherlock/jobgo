@@ -1,0 +1,162 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    background: #fff;
+    color: #1a1a1a;
+    width: 380px;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    flex: 1;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot.online {
+    background: #22c55e;
+}
+
+.dot.offline {
+    background: #ef4444;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tab {
+    flex: 1;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+    font-weight: 600;
+}
+
+.tab-panel {
+    padding: 8px;
+}
+
+.hidden {
+    display: none;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.toolbar label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+button#btn-scan {
+    padding: 4px 10px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+button#btn-scan:hover {
+    background: #1d4ed8;
+}
+
+#scan-status {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.item-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.item-list li {
+    padding: 8px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.job-title {
+    font-weight: 600;
+}
+
+.job-meta {
+    color: #6b7280;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.score-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-left: 3px;
+}
+
+.tag-visa {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.tag-newgrad {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.tag-remote {
+    background: #f3f4f6;
+    color: #374151;
+}

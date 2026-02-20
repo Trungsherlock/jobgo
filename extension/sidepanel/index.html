@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JobGo</title>
+    <link rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+    <header>
+        <h1>JobGo</h1>
+        <span id="status-dot" class="dot offline" title="Backend status"></span>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab active" data-tab="jobs">Jobs</button>
+        <button class="tab" data-tab="cart">Cart</button>
+        <button class="tab" data-tab="companies">Companies</button>
+    </nav>
+
+    <!-- Jobs tab -->
+    <section id="tab-jobs" class="tab-panel active">
+        <div class="toolbar">
+            <label><input type="checkbox" id="filter-new"> New only</label>
+            <label><input type="checkbox" id="filter-remote"> Remote</label>
+            <label><input type="checkbox" id="filter-visa"> Visa friendly</label>
+            <label><input type="checkbox" id="filter-newgrad"> New grad</label>
+        </div>
+        <ul id="jobs-list" class="item-list"></ul>
+    </section>
+
+    <!-- Cart tab -->
+    <section id="tab-cart" class="tab-panel hidden">
+        <div class="toolbar">
+            <button id="btn-scan">Scan Now</button>
+            <span id="scan-status"></span>
+        </div>
+        <ul id="cart-list" class="item-list"></ul>
+    </section>
+
+    <!-- Companies tab -->
+    <section id="tab-companies" class="tab-panel hidden">
+        <ul id="companies-list" class="item-list"></ul>
+    </section>
+
+    <script type="module" src="index.js"></script>
+</body>
+
+</html>
