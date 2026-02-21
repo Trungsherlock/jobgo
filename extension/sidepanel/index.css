@@ -1,3 +1,4 @@
+/* === BASE === */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -159,4 +160,151 @@ button#btn-scan:hover {
 .tag-remote {
     background: #f3f4f6;
     color: #374151;
+}
+
+/* === COMPANY ROW === */
+.company-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.btn-cart {
+    flex-shrink: 0;
+    padding: 3px 8px;
+    font-size: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: #f9fafb;
+    color: #374151;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-cart:hover {
+    background: #f3f4f6;
+}
+
+.btn-cart.in-cart {
+    background: #dbeafe;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+.btn-cart:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* === JOB EXPAND === */
+.job-item {
+    cursor: pointer;
+}
+
+.job-item.expanded {
+    border-color: #93c5fd;
+    background: #f8faff;
+}
+
+.job-header {
+    pointer-events: none;
+}
+
+.job-detail {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+    pointer-events: all;
+}
+
+.detail-desc {
+    font-size: 11px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.detail-reason {
+    font-size: 11px;
+    color: #6b7280;
+    font-style: italic;
+    margin-bottom: 6px;
+}
+
+.btn-apply {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #22c55e;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 11px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-apply:hover {
+    background: #16a34a;
+}
+
+/* === SETTINGS === */
+.settings-form {
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.settings-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.settings-input {
+    padding: 6px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+    width: 100%;
+}
+
+.settings-input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-primary {
+    padding: 6px 14px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.saved-msg {
+    font-size: 12px;
+    color: #22c55e;
+    font-weight: 500;
 }

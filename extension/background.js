@@ -10,8 +10,24 @@ chrome.action.onClicked.addListener((tab) => {
 // Set up a 30-minute alarm for background polling
 chrome.runtime.onInstalled.addListener(() => {
     chrome.alarms.create("poll", { periodInMinutes: 30 });
-    console.log("JobGo installed - polling alarm set to 30 min");
+    updateBadge();
 });
+
+chrome.runtime.onStartup.addListener(() => {
+    updateBadge();
+});
+
+async function updateBadge() {
+    try {
+        const res = await fetch(`${API_BASE}/jobs?new=true`);
+        const jobs = await res.json();
+        const count = Array.isArray(jobs) ? jobs.length : 0;
+        chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
+        chrome.action.setBadgeBackgroundColor({ color: "#2563eb" });
+    } catch {
+        chrome.action.setBadgeText({ text: "" });
+    }
+}
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name !== "poll") return;
@@ -23,7 +39,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         if (data.new_jobs > 0) {
             chrome.notifications.create({
                 type: "basic",
-                iconUrl: "icons/icons48.png",
+                iconUrl: "icons/icon16.png",
                 title: "JobGo - New Jobs Found",
                 message: `${data.new_jobs} new job(s) matched your profile`,
             });
@@ -41,5 +57,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
             .then((data) => sendResponse({ ok: true, data }))
             .catch((err) => sendResponse({ ok: false, error: err.message }));
         return true;
+    }
+    if (msg.type === "CLEAR_BADGE") {
+        chrome.action.setBadgeText({ text: "" });
     }
 });

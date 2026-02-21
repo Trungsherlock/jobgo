@@ -1,9 +1,17 @@
 // utils/api.js - thin fetch wrapper around the Go backend
 
-const BASE = "http://localhost:8080/api";
+const config = {
+    base: "http://localhost:8080/api",
+    minScore: 0,
+};
+
+export function configure(opts) {
+    if (opts.base) config.base = opts.base.replace(/\/$/, "");
+    if (opts.minScore !== undefined) config.minScore = Number(opts.minScore);
+}
 
 async function apiFetch(path, options = {}) {
-    const res = await fetch(BASE + path, {
+    const res = await fetch(config.base + path, {
         headers: {"Content-Type": "application/json" },
         ...options,
     });
@@ -17,6 +25,8 @@ async function apiFetch(path, options = {}) {
 export const api = {
     // Jobs
     listJobs: (params = {}) => {
+        if (config.minScore > 0 && !params.min_score)
+            params.min_score = config.minScore;
         const q = new URLSearchParams(params).toString();
         return apiFetch(`/jobs${q ? "?" + q : ""}`);
     },

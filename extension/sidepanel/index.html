@@ -18,6 +18,7 @@
         <button class="tab active" data-tab="jobs">Jobs</button>
         <button class="tab" data-tab="cart">Cart</button>
         <button class="tab" data-tab="companies">Companies</button>
+        <button class="tab" data-tab="settings">⚙</button>
     </nav>
 
     <!-- Jobs tab -->
@@ -43,6 +44,24 @@
     <!-- Companies tab -->
     <section id="tab-companies" class="tab-panel hidden">
         <ul id="companies-list" class="item-list"></ul>
+    </section>
+
+    <!-- Settings tab -->
+    <section id="tab-settings" class="tab-panel hidden">
+        <div class="settings-form">
+            <label class="settings-label">
+                Backend URL
+                <input type="text" id="setting-url" class="settings-input" placeholder="http://localhost:8080/api" />
+            </label>
+            <label class="settings-label">
+                Min match score: <span id="setting-score-label">0%</span>
+                <input type="range" id="setting-score" min="0" max="100" value="0" />
+            </label>
+            <div class="settings-row">
+                <button id="btn-save-settings" class="btn-primary">Save</button>
+                <span id="settings-saved" class="saved-msg"></span>
+            </div>
+        </div>
     </section>
 
     <script type="module" src="index.js"></script>
