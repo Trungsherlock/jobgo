@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Trungsherlock/jobgocli/internal/database"
+	"github.com/Trungsherlock/jobgocli/internal/skills"
 	"github.com/spf13/cobra"
 )
 
@@ -68,8 +69,8 @@ var profileSetCmd = &cobra.Command{
 			p.Email, _ = cmd.Flags().GetString("email")
 		}
 		if cmd.Flags().Changed("skills") {
-			skills, _ := cmd.Flags().GetString("skills")
-			p.Skills = toJSONArray(skills)
+			raw, _ := cmd.Flags().GetString("skills")
+			p.Skills = normalizeSkillsCSV(raw)
 		}
 		if cmd.Flags().Changed("roles") {
 			roles, _ := cmd.Flags().GetString("roles")
@@ -110,6 +111,20 @@ func toJSONArray(csv string) string {
 		}
 	}
 	return "[" + strings.Join(quoted, ",") + "]"
+}
+
+func normalizeSkillsCSV(csv string) string {
+	parts := strings.Split(csv, ",")
+	normalized := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+		canonical := skills.Normalize(p)
+		normalized = append(normalized, `"`+canonical+`"`)
+	}
+	return "[" + strings.Join(normalized, ",") + "]"
 }
 
 func init() {
