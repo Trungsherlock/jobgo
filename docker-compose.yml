@@ -1,0 +1,11 @@
+services:
+  jobgo:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - jobgo-data:/root/.jobgo
+    restart: unless-stopped
+
+volumes:
+  jobgo-data:
