@@ -45,9 +45,30 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
             });
         }
     } catch (err) {
-        console.error("JobGo poll falied:", err)
+        console.error("JobGo poll failed:", err)
     }
 });
+
+// Add a company from a career page and put it in the cart
+async function addToJobGo({ name, platform, slug }) {
+    let company;
+    const createRes = await fetch(`${API_BASE}/companies`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json" },
+        body: JSON.stringify({ name, platform, slug }),
+    });
+
+    if (createRes.ok) {
+        company = await createRes.json();
+    } else {
+        const all = await fetch(`${API_BASE}/companies`).then((r) => r.json());
+        company = all.find((c) => c.slug === slug && c.platform === platform);
+        if (!company) throw new Error("Could not create or find company");
+    }
+
+    await fetch(`${API_BASE}/jobcart/${company.id}`, { method: "POST" });
+    return { ok: true };
+}
 
 // Handle messages from the side panel
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -60,5 +81,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     }
     if (msg.type === "CLEAR_BADGE") {
         chrome.action.setBadgeText({ text: "" });
+    }
+    if (msg.type === "ADD_TO_JOBGO") {
+        addToJobGo(msg)
+            .then(sendResponse)
+            .catch((err) => sendResponse({ ok: false, error: err.message }));
+        return true;
     }
 });
