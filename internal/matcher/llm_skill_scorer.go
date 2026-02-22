@@ -93,7 +93,7 @@ Respond with ONLY valid JSON, no explanation outside the JSON:
     if err != nil {
         return SkillScoreResult{}, fmt.Errorf("calling API: %w", err)
     }
-    defer resp.Body.Close()
+    defer func() { _ = resp.Body.Close() }()
 
     var claudeResp claudeResponse
     if err := json.NewDecoder(resp.Body).Decode(&claudeResp); err != nil {
@@ -125,10 +125,5 @@ Respond with ONLY valid JSON, no explanation outside the JSON:
         llmResp.Score = 100
     }
 
-    return SkillScoreResult{
-        Score:         llmResp.Score,
-        MatchedSkills: llmResp.MatchedSkills,
-        MissingSkills: llmResp.MissingSkills,
-        Reason:        llmResp.Reason,
-    }, nil
+    return SkillScoreResult(llmResp), nil
 }
