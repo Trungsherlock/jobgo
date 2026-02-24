@@ -60,6 +60,16 @@
                 Min match score: <span id="setting-score-label">0%</span>
                 <input type="range" id="setting-score" min="0" max="100" value="0" />
             </label>
+            <label class="settings-label">
+                Poll interval
+                <select id="setting-interval" class="settings-input">
+                    <option value="1440">Every 1 day</option>
+                    <option value="2880" selected>Every 2 days</option>
+                    <option value="7200">Every 5 days</option>
+                    <option value="10080">Every 1 week</option>
+                    <option value="0">Off</option>
+                </select>
+            </label>
             <div class="settings-row">
                 <button id="btn-save-settings" class="btn-primary">Save</button>
                 <span id="settings-saved" class="saved-msg"></span>

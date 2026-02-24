@@ -18,6 +18,7 @@ WORKDIR /root/
 
 COPY --from=builder /app/jobgo .
 COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/data ./data
 
 EXPOSE 8080
 

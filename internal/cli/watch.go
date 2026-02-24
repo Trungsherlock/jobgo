@@ -2,19 +2,19 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"encoding/json"
 
 	"github.com/Trungsherlock/jobgo/internal/database"
+	"github.com/Trungsherlock/jobgo/internal/filter"
 	"github.com/Trungsherlock/jobgo/internal/matcher"
+	"github.com/Trungsherlock/jobgo/internal/notifier"
 	"github.com/Trungsherlock/jobgo/internal/scraper"
 	"github.com/Trungsherlock/jobgo/internal/worker"
-	"github.com/Trungsherlock/jobgo/internal/notifier"
-	"github.com/Trungsherlock/jobgo/internal/filter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -25,6 +25,7 @@ var watchCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		interval, _ := cmd.Flags().GetDuration("interval")
 		minScore, _ := cmd.Flags().GetFloat64("min-score")
+		cartOnly, _ := cmd.Flags().GetBool("cart")
 
 		var notifiers []notifier.Notifier
 		notifiers = append(notifiers, notifier.NewTerminalNotifier())
@@ -53,12 +54,16 @@ var watchCmd = &cobra.Command{
 			cancel()
 		}()
 
-		fmt.Printf("Watching for new jobs every %s (min score: %.0f). Press Ctrl+C to stop.\n\n", interval, minScore)
+		if cartOnly {
+			fmt.Printf("Watching cart companies every %s (min score: %.0f). Press Ctrl+C to stop.\n\n", interval, minScore)
+		} else {
+			fmt.Printf("Watching for new jobs every %s (min score: %.0f). Press Ctrl+C to stop.\n\n", interval, minScore)
+		}
 
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
-		runCycle(ctx, minScore, notifiers)
+		runCycle(ctx, minScore, notifiers, cartOnly)
 
 		for {
 			select {
@@ -66,32 +71,51 @@ var watchCmd = &cobra.Command{
 				fmt.Println("Watch stopped.")
 				return nil
 			case <-ticker.C:
-				runCycle(ctx, minScore, notifiers)
+				runCycle(ctx, minScore, notifiers, cartOnly)
 			}
 		}
 	},
 }
 
-func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifier) {
+func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifier, cartOnly bool) {
 	if ctx.Err() != nil {
 		return
 	}
 
-	companies, err := db.ListCompanies()
+	var companies []database.Company
+	var err error
+	if cartOnly {
+		companies, err = db.ListCartCompanies()
+	} else {
+		companies, err = db.ListCompanies()
+	}
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error listing companies: %v\n", err)
 		return
 	}
 
 	var enabled []database.Company
-	for _, c := range companies {
-		if c.Enabled {
-			enabled = append(enabled, c)
+	if cartOnly {
+		// Cart companies are already filtered; just ensure they're enabled
+		for _, c := range companies {
+			if c.Enabled {
+				enabled = append(enabled, c)
+			}
+		}
+	} else {
+		for _, c := range companies {
+			if c.Enabled {
+				enabled = append(enabled, c)
+			}
 		}
 	}
 
 	if len(enabled) == 0 {
-		fmt.Println("No companies to watch.")
+		if cartOnly {
+			fmt.Println("No companies in cart to watch.")
+		} else {
+			fmt.Println("No companies to watch.")
+		}
 		return
 	}
 
@@ -123,7 +147,7 @@ func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifi
 
 	// Print new high-match jobs
 	if totalNew > 0 && profile != nil {
-        highMatches, _ := db.ListJobs(minScore, "", true, false, false, false, false)
+		highMatches, _ := db.ListJobs(minScore, "", true, false, false, false, false)
 
 		params := filter.Params{}
 		if profile.PreferredRoles != "" {
@@ -134,9 +158,9 @@ func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifi
 		}
 		var sponsorIDs map[string]bool
 		if profile.VisaRequired {
-			companies, _ := db.ListCompanies()
+			allCompanies, _ := db.ListCompanies()
 			sponsorIDs = make(map[string]bool)
-			for _, c := range companies {
+			for _, c := range allCompanies {
 				if c.SponsorsH1b {
 					sponsorIDs[c.ID] = true
 				}
@@ -146,30 +170,30 @@ func runCycle(ctx context.Context, minScore float64, notifiers []notifier.Notifi
 
 		filtered := filter.Apply(highMatches, filter.Build(params, sponsorIDs))
 
-        for _, j := range filtered {
-            score := 0.0
-            if j.SkillScore != nil {
-                score = *j.SkillScore
-            }
-            for _, n := range notifiers {
-                _ = n.Notify(j, j.CompanyName, score)
-            }
-        }
-    }
+		for _, j := range filtered {
+			score := 0.0
+			if j.SkillScore != nil {
+				score = *j.SkillScore
+			}
+			for _, n := range notifiers {
+				_ = n.Notify(j, j.CompanyName, score)
+			}
+		}
+	}
 }
 
 func parseJSONArray(s string) []string {
-    if s == "" {
-        return nil
-    }
-    var arr []string
-    _ = json.Unmarshal([]byte(s), &arr)
-    return arr
+	if s == "" {
+		return nil
+	}
+	var arr []string
+	_ = json.Unmarshal([]byte(s), &arr)
+	return arr
 }
-
 
 func init() {
 	rootCmd.AddCommand(watchCmd)
 	watchCmd.Flags().Duration("interval", 30*time.Minute, "Polling interval between scrapes")
 	watchCmd.Flags().Float64("min-score", 50.0, "Minimum score to highlight")
+	watchCmd.Flags().Bool("cart", false, "Only watch companies in your job cart")
 }

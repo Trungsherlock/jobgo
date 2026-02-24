@@ -7,9 +7,68 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	_ "modernc.org/sqlite"
 )
+
+// SQLite returns DATETIME columns as strings; these scanners handle both string and time.Time.
+
+var sqliteTimeLayouts = []string{
+	time.RFC3339,
+	"2006-01-02T15:04:05Z",
+	"2006-01-02 15:04:05 -0700 -0700", // Go time.Time.String() format
+	"2006-01-02 15:04:05 -0700 MST",
+	"2006-01-02 15:04:05",
+	"2006-01-02",
+}
+
+func parseSQLiteTime(v interface{}) (time.Time, error) {
+	switch x := v.(type) {
+	case time.Time:
+		return x, nil
+	case string:
+		for _, layout := range sqliteTimeLayouts {
+			if t, err := time.Parse(layout, x); err == nil {
+				return t, nil
+			}
+		}
+		return time.Time{}, fmt.Errorf("cannot parse %q as time", x)
+	}
+	return time.Time{}, fmt.Errorf("unsupported time scan type %T", v)
+}
+
+// NullableTime scans a nullable SQLite datetime column into *time.Time.
+type NullableTime struct{ T **time.Time }
+
+func (s NullableTime) Scan(v interface{}) error {
+	if v == nil {
+		*s.T = nil
+		return nil
+	}
+	t, err := parseSQLiteTime(v)
+	if err != nil {
+		return err
+	}
+	*s.T = &t
+	return nil
+}
+
+// RequiredTime scans a non-null SQLite datetime column into time.Time.
+type RequiredTime struct{ T *time.Time }
+
+func (s RequiredTime) Scan(v interface{}) error {
+	if v == nil {
+		*s.T = time.Time{}
+		return nil
+	}
+	t, err := parseSQLiteTime(v)
+	if err != nil {
+		return err
+	}
+	*s.T = t
+	return nil
+}
 
 type DB struct {
 	*sql.DB

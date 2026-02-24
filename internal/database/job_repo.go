@@ -27,7 +27,7 @@ func (d *DB) GetJob(id string) (*Job, error) {
 	err := d.QueryRow(
 		`SELECT j.id, j.company_id, COALESCE(c.name, '') as company_name, j.external_id, j.title, j.description, j.location, j.remote, j.department, j.skills, j.url, j.posted_at, j.scraped_at, j.match_score, j.match_reason, j.status, j.created_at, j.experience_level, j.visa_mentioned, j.visa_sentiment, j.is_new_grad, j.skill_score, j.skill_matched, j.skill_missing, j.skill_reason, j.skill_scored_at
 		 FROM jobs j LEFT JOIN companies c ON j.company_id = c.id WHERE j.id = ?`, id,
-	).Scan(&j.ID, &j.CompanyID, &j.CompanyName, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, &j.PostedAt, &j.ScrapedAt, &j.MatchScore, &j.MatchReason, &j.Status, &j.CreatedAt, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad, &j.SkillScore, &j.SkillMatched, &j.SkillMissing, &j.SkillReason, &j.SkillScoredAt)
+	).Scan(&j.ID, &j.CompanyID, &j.CompanyName, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, NullableTime{&j.PostedAt}, NullableTime{&j.ScrapedAt}, &j.MatchScore, &j.MatchReason, &j.Status, RequiredTime{&j.CreatedAt}, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad, &j.SkillScore, &j.SkillMatched, &j.SkillMissing, &j.SkillReason, NullableTime{&j.SkillScoredAt})
 	if err != nil {
 		return nil, fmt.Errorf("getting job: %w", err)
 	}
@@ -85,7 +85,7 @@ func (d *DB) listJobsWhere(where string, args ...interface{}) ([]Job, error) {
 	jobs := make([]Job, 0)
 	for rows.Next() {
 		var j Job
-		if err := rows.Scan(&j.ID, &j.CompanyID, &j.CompanyName, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, &j.PostedAt, &j.ScrapedAt, &j.MatchScore, &j.MatchReason, &j.Status, &j.CreatedAt, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad, &j.SkillScore, &j.SkillMatched, &j.SkillMissing, &j.SkillReason, &j.SkillScoredAt); err != nil {
+		if err := rows.Scan(&j.ID, &j.CompanyID, &j.CompanyName, &j.ExternalID, &j.Title, &j.Description, &j.Location, &j.Remote, &j.Department, &j.Skills, &j.URL, NullableTime{&j.PostedAt}, NullableTime{&j.ScrapedAt}, &j.MatchScore, &j.MatchReason, &j.Status, RequiredTime{&j.CreatedAt}, &j.ExperienceLevel, &j.VisaMentioned, &j.VisaSentiment, &j.IsNewGrad, &j.SkillScore, &j.SkillMatched, &j.SkillMissing, &j.SkillReason, NullableTime{&j.SkillScoredAt}); err != nil {
 			return nil, fmt.Errorf("scanning job: %w", err)
 		}
 		jobs = append(jobs, j)

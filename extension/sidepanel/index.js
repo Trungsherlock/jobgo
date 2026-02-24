@@ -7,13 +7,14 @@ chrome.runtime.sendMessage({ type: "CLEAR_BADGE" }).catch(() => {});
 async function initSettings() {
   return new Promise((resolve) => {
     chrome.storage.local.get(
-      { backendUrl: "http://localhost:8080/api", minScore: 0 },
+      { backendUrl: "http://localhost:8080/api", minScore: 0, watchInterval: 2880 },
       (s) => {
         configure({ base: s.backendUrl, minScore: s.minScore });
         document.getElementById("setting-url").value = s.backendUrl;
         document.getElementById("setting-score").value = s.minScore;
         document.getElementById("setting-score-label").textContent =
           s.minScore + "%";
+        document.getElementById("setting-interval").value = String(s.watchInterval);
         resolve();
       }
     );
@@ -237,9 +238,11 @@ document.getElementById("btn-save-settings").addEventListener("click", () => {
     document.getElementById("setting-url").value.trim() ||
     "http://localhost:8080/api";
   const score = parseInt(document.getElementById("setting-score").value, 10) || 0;
+  const watchInterval = parseInt(document.getElementById("setting-interval").value, 10);
 
-  chrome.storage.local.set({ backendUrl: url, minScore: score }, () => {
+  chrome.storage.local.set({ backendUrl: url, minScore: score, watchInterval }, () => {
     configure({ base: url, minScore: score });
+    chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED", backendUrl: url, watchInterval });
     document.getElementById("settings-saved").textContent = "Saved!";
     setTimeout(
       () => (document.getElementById("settings-saved").textContent = ""),

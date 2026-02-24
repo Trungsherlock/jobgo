@@ -1,11 +1,29 @@
 services:
-  jobgo:
+  # REST API server — serves the Chrome extension and curl commands
+  api:
     build: .
+    command: ["./jobgo", "serve", "--port", "8080"]
     ports:
       - "8080:8080"
     volumes:
       - jobgo-data:/root/.jobgo
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
     restart: unless-stopped
+
+  # Background watcher — scrapes and notifies every 30 minutes
+  # Start with: docker compose --profile watch up -d
+  watch:
+    build: .
+    command: ["./jobgo", "watch", "--interval", "30m", "--min-score", "50"]
+    volumes:
+      - jobgo-data:/root/.jobgo
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    restart: unless-stopped
+    profiles:
+      - watch
 
 volumes:
   jobgo-data:
+    # SQLite DB lives at /root/.jobgo/jobgo.db inside the volume
