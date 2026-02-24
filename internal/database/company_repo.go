@@ -23,7 +23,7 @@ func (d *DB) GetCompany(id string) (*Company, error) {
 	err := d.QueryRow(
 		`SELECT id, name, platform, slug, career_url, enabled, last_scraped_at, created_at,
 		h1b_sponsor_id, sponsors_h1b, h1b_approval_rate, h1b_total_filed, COALESCE(in_cart, 0), cart_added_at, last_notified_at FROM companies WHERE id = ?`, id,
-	).Scan(&c.ID, &c.Name, &c.Platform, &c.Slug, &c.CareerURL, &c.Enabled, &c.LastScrapedAt, &c.CreatedAt, &c.H1bSponsorID, &c.SponsorsH1b, &c.H1bApprovalRate, &c.H1bTotalFiled, &c.InCart, &c.CartAddedAt, &c.LastNotifiedAt)
+	).Scan(&c.ID, &c.Name, &c.Platform, &c.Slug, &c.CareerURL, &c.Enabled, NullableTime{&c.LastScrapedAt}, RequiredTime{&c.CreatedAt}, &c.H1bSponsorID, &c.SponsorsH1b, &c.H1bApprovalRate, &c.H1bTotalFiled, &c.InCart, NullableTime{&c.CartAddedAt}, NullableTime{&c.LastNotifiedAt})
 	if err != nil {
 		return nil, fmt.Errorf("getting company: %w", err)
 	}
@@ -68,9 +68,9 @@ func (d *DB) listCompaniesWhere(where string) ([]Company, error) {
 	for rows.Next() {
 		var c Company
 		if err := rows.Scan(&c.ID, &c.Name, &c.Platform, &c.Slug, &c.CareerURL, &c.Enabled,
-		&c.LastScrapedAt, &c.CreatedAt, &c.H1bSponsorID, &c.SponsorsH1b,
+		NullableTime{&c.LastScrapedAt}, RequiredTime{&c.CreatedAt}, &c.H1bSponsorID, &c.SponsorsH1b,
 		&c.H1bApprovalRate, &c.H1bTotalFiled,
-		&c.InCart, &c.CartAddedAt, &c.LastNotifiedAt); err != nil {
+		&c.InCart, NullableTime{&c.CartAddedAt}, NullableTime{&c.LastNotifiedAt}); err != nil {
 			return nil, err
 		}
 		companies = append(companies, c)

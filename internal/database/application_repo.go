@@ -25,7 +25,7 @@ func (d *DB) GetApplication(id string) (*Application, error) {
 	a := &Application{}
 	err := d.QueryRow(
 		`SELECT id, job_id, applied_at, status, notes, updated_at FROM applications WHERE id = ?`, id,
-	).Scan(&a.ID, &a.JobID, &a.AppliedAt, &a.Status, &a.Notes, &a.UpdatedAt)
+	).Scan(&a.ID, &a.JobID, RequiredTime{&a.AppliedAt}, &a.Status, &a.Notes, RequiredTime{&a.UpdatedAt})
 	if err != nil {
 		return nil, fmt.Errorf("getting application: %w", err)
 	}
