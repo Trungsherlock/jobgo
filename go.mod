@@ -8,7 +8,7 @@ require (
 	github.com/mark3labs/mcp-go v0.44.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
-	golang.org/x/text v0.34.0
+	golang.org/x/text v0.36.0
 	modernc.org/sqlite v1.46.1
 )
 
